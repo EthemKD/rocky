@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Every table prints the whole run id.** `rocky history`, its `--audit` and `--model` tables, and `rocky metrics --trend` cut the id to 9, 11 or 13 characters, so two runs a second apart printed the same string and the printed value could not be pasted into `rocky trace`, `rocky cost --run` or `rocky replay`. All four print the full 23-character id; the widest table, the governance audit trail, grows from 100 to 112 columns. (#2025)
+
 - **The drop-and-recreate drift reason prints the two types in the order the change runs.** It read `changed {source} → {target}`, so a column that went `TIMESTAMP` to `DATE` was reported as `changed DATE → TIMESTAMP` — backwards, on the one drift action that drops the operator's table, and carried into `RunOutput.drift.reason` for orchestrators and the browser UI. The ALTER reason beside it was already right; both now go through one helper with one test. (#2022)
 
 - **A `[[test]]` block on a `.rocky` model runs, and so does its `[[surrogate_key]]` block.** Both sidecar loaders in `rocky-core`'s `models.rs` scanned `.sql` files only, so a DSL model's sidecar was never opened: `rocky test` printed no unit-test line at all and exited 0 on an expectation that was plainly wrong, and the surrogate-key column was never added to the built table. A unit test that cannot fail is worse than a missing one, so any project whose DSL models carried `[[test]]` blocks was green on checks that never ran. Both loaders now read `.sql` and `.rocky`, matching the column-doc loader beside them. (#2015)
